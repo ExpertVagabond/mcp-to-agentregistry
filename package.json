@@ -1,0 +1,43 @@
+{
+  "name": "mcp-to-agentregistry",
+  "version": "1.0.0",
+  "description": "Auto-package npm-published MCP servers for agentregistry. Bridge the gap between npm and Solo.io's agent registry.",
+  "type": "module",
+  "bin": {
+    "mcp2ar": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "agentregistry",
+    "model-context-protocol",
+    "ai-agents",
+    "registry",
+    "cli",
+    "solo-io",
+    "blockchain"
+  ],
+  "author": "ExpertVagabond",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ExpertVagabond/mcp-to-agentregistry.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0"
+  }
+}

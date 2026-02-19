@@ -1,0 +1,74 @@
+{
+  "collection": "blockchain-mcp-collection",
+  "namespace": "io.github.ExpertVagabond",
+  "servers": [
+    {
+      "npmPackage": "ordinals-mcp",
+      "envVars": [
+        {
+          "name": "HIRO_API_KEY",
+          "description": "Hiro API key for Bitcoin Ordinals data (optional, increases rate limits)",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "ORDISCAN_API_KEY",
+          "description": "Ordiscan API key for fallback data source",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    },
+    {
+      "npmPackage": "solana-mcp-server",
+      "envVars": [
+        {
+          "name": "SOLANA_RPC_URL",
+          "description": "Solana RPC endpoint (defaults to mainnet-beta)",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    },
+    {
+      "npmPackage": "solmail-mcp",
+      "envVars": [
+        {
+          "name": "SOLANA_PRIVATE_KEY",
+          "description": "Solana wallet private key for sending mail payments",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "LOB_API_KEY",
+          "description": "Lob.com API key for printing and mailing physical letters",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "SOLMAIL_MODE",
+          "description": "Operating mode: 'demo' (testnet + Lob test) or 'production' (mainnet + real mail)",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    },
+    {
+      "npmPackage": "universal-blockchain-mcp",
+      "envVars": [
+        {
+          "name": "ZETACHAIN_RPC_URL",
+          "description": "ZetaChain RPC endpoint",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "PRIVATE_KEY",
+          "description": "Wallet private key for transaction signing",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
