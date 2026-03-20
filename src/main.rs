@@ -6,6 +6,62 @@ const NPM_REGISTRY: &str = "https://registry.npmjs.org";
 const SCHEMA_URL: &str =
     "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json";
 
+// ---- Security: input validation constants ----
+/// Maximum length for npm package names (npm limit is 214).
+const MAX_PACKAGE_NAME_LEN: usize = 214;
+/// Maximum length for version strings.
+const MAX_VERSION_LEN: usize = 64;
+/// Maximum length for namespace strings.
+const MAX_NAMESPACE_LEN: usize = 256;
+/// Maximum allowed config file size (10 MB).
+const MAX_CONFIG_FILE_SIZE: u64 = 10 * 1024 * 1024;
+
+/// Validate an npm package name — no shell metacharacters, reasonable length.
+fn validate_package_name(name: &str) -> Result<(), String> {
+    if name.is_empty() || name.len() > MAX_PACKAGE_NAME_LEN {
+        return Err(format!("Package name must be 1-{MAX_PACKAGE_NAME_LEN} characters"));
+    }
+    // npm package names: alphanumeric, -, _, ., @, /
+    if !name.chars().all(|c| c.is_ascii_alphanumeric() || "-_.@/".contains(c)) {
+        return Err(format!("Package name contains invalid characters: {name}"));
+    }
+    Ok(())
+}
+
+/// Validate a version string — semver-like, no injection.
+fn validate_version(v: &str) -> Result<(), String> {
+    if v.len() > MAX_VERSION_LEN {
+        return Err("Version string too long".into());
+    }
+    if !v.chars().all(|c| c.is_ascii_alphanumeric() || "-_.+".contains(c)) {
+        return Err(format!("Version contains invalid characters: {v}"));
+    }
+    Ok(())
+}
+
+/// Validate a URL is https or http (no file://, javascript://, etc.).
+fn validate_url(url: &str) -> Result<(), String> {
+    if !url.starts_with("https://") && !url.starts_with("http://") {
+        return Err(format!("URL must use http(s) scheme: {url}"));
+    }
+    if url.len() > 2048 {
+        return Err("URL exceeds maximum length of 2048".into());
+    }
+    Ok(())
+}
+
+/// Validate a file path for config — must exist, reasonable size.
+fn validate_config_path(p: &str) -> Result<(), String> {
+    if p.contains('\0') {
+        return Err("Config path contains null bytes".into());
+    }
+    let meta = std::fs::metadata(p).map_err(|e| format!("Cannot read config file: {e}"))?;
+    if meta.len() > MAX_CONFIG_FILE_SIZE {
+        return Err(format!("Config file exceeds {MAX_CONFIG_FILE_SIZE} bytes"));
+    }
+    Ok(())
+}
+
 #[derive(Parser)]
 #[command(
     name = "mcp2ar",
