@@ -15,10 +15,20 @@ export class RegistryClient {
   private token?: string;
 
   constructor(baseUrl?: string, token?: string) {
-    this.baseUrl =
+    const url =
       baseUrl ??
       process.env.ARCTL_API_BASE_URL ??
       "http://localhost:12121";
+    // Validate URL format
+    try {
+      const parsed = new URL(url);
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        throw new Error("Only http/https protocols are supported");
+      }
+      this.baseUrl = parsed.origin;
+    } catch (e) {
+      throw new Error(`Invalid registry URL: ${url}`);
+    }
     this.token = token ?? process.env.ARCTL_API_TOKEN;
   }
 
