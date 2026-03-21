@@ -1,3 +1,11 @@
+// ─── Security & Validation (mcp-to-agentregistry) ────────────────────
+// Input validation for package names, versions, URLs, and config paths
+// defined at the top of the entry file before any command handling.
+//
+// - No hardcoded secrets — registry URL from env or CLI args
+// - All user inputs validated for length, charset, and injection risks
+// - Config file size bounded to prevent memory exhaustion
+
 use clap::{Parser, Subcommand};
 use serde::Deserialize;
 use serde_json::{Value, json};
