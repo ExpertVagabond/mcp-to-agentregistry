@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { introspectServer } from "../lib/introspector.js";
+import { sanitizeError } from "../cli.js";
 
 export const inspectCommand = new Command("inspect")
   .description("Introspect an MCP server to discover its tools")
@@ -40,7 +41,7 @@ export const inspectCommand = new Command("inspect")
       }
     } catch (err) {
       console.error(
-        `Error: ${err instanceof Error ? err.message : String(err)}`,
+        `Error: ${sanitizeError(err)}`,
       );
       process.exit(1);
     }

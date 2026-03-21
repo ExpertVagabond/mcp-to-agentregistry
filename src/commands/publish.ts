@@ -3,6 +3,7 @@ import { fetchNpmMetadata } from "../lib/npm-fetcher.js";
 import { buildArtifact } from "../lib/artifact-builder.js";
 import { introspectServer } from "../lib/introspector.js";
 import { RegistryClient } from "../lib/registry-client.js";
+import { sanitizeError } from "../cli.js";
 import type { BuildOptions } from "../lib/types.js";
 
 export const publishCommand = new Command("publish")
@@ -37,7 +38,7 @@ export const publishCommand = new Command("publish")
           console.log(`  Discovered ${tools.length} tools`);
         } catch (err) {
           console.log(
-            `  Warning: introspection failed: ${err instanceof Error ? err.message : String(err)}`,
+            `  Warning: introspection failed: ${sanitizeError(err)}`,
           );
         }
       }
@@ -68,7 +69,7 @@ export const publishCommand = new Command("publish")
       console.log(`  Published: ${result.spec?.name ?? artifact.name}@${result.spec?.version ?? artifact.version}`);
     } catch (err) {
       console.error(
-        `Error: ${err instanceof Error ? err.message : String(err)}`,
+        `Error: ${sanitizeError(err)}`,
       );
       process.exit(1);
     }
