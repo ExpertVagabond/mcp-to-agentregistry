@@ -15,6 +15,11 @@ const SCHEMA_URL: &str =
     "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json";
 
 // ---- Security: input validation constants ----
+/// Sanitize error messages — strip internal paths before display.
+fn sanitize_error(msg: &str) -> String {
+    msg.lines().next().unwrap_or("Internal error").chars().take(500).collect()
+}
+
 /// Maximum length for npm package names (npm limit is 214).
 const MAX_PACKAGE_NAME_LEN: usize = 214;
 /// Maximum length for version strings.
