@@ -1,5 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { sanitizeError } from "../cli.js";
 import type { ToolInfo } from "./types.js";
 
 export async function introspectServer(
@@ -47,7 +48,7 @@ export async function introspectServer(
   } catch (err) {
     clearTimeout(timer);
     throw new Error(
-      `Failed to introspect ${npmPackage}: ${err instanceof Error ? err.message : String(err)}`,
+      `Failed to introspect ${npmPackage}: ${sanitizeError(err)}`,
     );
   } finally {
     await client.close().catch(() => {});

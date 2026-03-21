@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { fetchNpmMetadata } from "../lib/npm-fetcher.js";
 import { buildArtifact } from "../lib/artifact-builder.js";
 import { RegistryClient } from "../lib/registry-client.js";
+import { sanitizeError } from "../cli.js";
 import type { BatchConfig, BuildOptions } from "../lib/types.js";
 
 export const batchCommand = new Command("batch")
@@ -66,7 +67,7 @@ export const batchCommand = new Command("batch")
           succeeded++;
         } catch (err) {
           console.error(
-            `  Failed: ${err instanceof Error ? err.message : String(err)}\n`,
+            `  Failed: ${sanitizeError(err)}\n`,
           );
           failed++;
         }
@@ -76,7 +77,7 @@ export const batchCommand = new Command("batch")
       if (failed > 0) process.exit(1);
     } catch (err) {
       console.error(
-        `Error: ${err instanceof Error ? err.message : String(err)}`,
+        `Error: ${sanitizeError(err)}`,
       );
       process.exit(1);
     }

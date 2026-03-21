@@ -2,6 +2,7 @@ import { Command } from "commander";
 import { fetchNpmMetadata } from "../lib/npm-fetcher.js";
 import { buildArtifact } from "../lib/artifact-builder.js";
 import { introspectServer } from "../lib/introspector.js";
+import { sanitizeError } from "../cli.js";
 import type { BuildOptions } from "../lib/types.js";
 import { writeFileSync } from "node:fs";
 
@@ -36,7 +37,7 @@ export const generateCommand = new Command("generate")
           console.error(`  Discovered ${tools.length} tools`);
         } catch (err) {
           console.error(
-            `  Warning: introspection failed: ${err instanceof Error ? err.message : String(err)}`,
+            `  Warning: introspection failed: ${sanitizeError(err)}`,
           );
         }
       }
@@ -52,7 +53,7 @@ export const generateCommand = new Command("generate")
       }
     } catch (err) {
       console.error(
-        `Error: ${err instanceof Error ? err.message : String(err)}`,
+        `Error: ${sanitizeError(err)}`,
       );
       process.exit(1);
     }
