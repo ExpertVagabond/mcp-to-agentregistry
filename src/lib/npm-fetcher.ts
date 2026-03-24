@@ -1,14 +1,17 @@
 import type { NpmPackageMetadata } from "./types.js";
+import { PsmMcpError, validateInputSize } from "@psm/mcp-core-ts";
 
 const NPM_REGISTRY = "https://registry.npmjs.org";
 
 /** Validate npm package name — must match npm naming rules */
 function validatePackageName(name: string): void {
-  if (!name || typeof name !== "string") throw new Error("Package name is required");
-  if (name.length > 214) throw new Error("Package name exceeds maximum length (214)");
+  if (!name || typeof name !== "string") {
+    throw PsmMcpError.inputValidation("Package name is required");
+  }
+  validateInputSize(name, 214);
   // npm package names: lowercase, can have @scope/, hyphens, dots, underscores
   if (!/^(@[a-z0-9\-~][a-z0-9\-._~]*\/)?[a-z0-9\-~][a-z0-9\-._~]*$/.test(name)) {
-    throw new Error(`Invalid npm package name: ${name}`);
+    throw PsmMcpError.inputValidation(`Invalid npm package name: ${name}`);
   }
 }
 
@@ -18,7 +21,7 @@ export async function fetchNpmMetadata(
 ): Promise<NpmPackageMetadata> {
   validatePackageName(packageName);
   if (version && !/^[a-zA-Z0-9.\-+]+$/.test(version)) {
-    throw new Error(`Invalid version format: ${version}`);
+    throw PsmMcpError.inputValidation(`Invalid version format: ${version}`);
   }
 
   const url = version

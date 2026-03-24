@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 // ─── Security: error sanitization ────────────────────────────────────
+// Delegates to @psm/mcp-core-ts for shared path-stripping, token redaction,
+// and truncation logic consistent with the Rust side.
+import { sanitizeError as coreSanitize } from "@psm/mcp-core-ts";
+
 /** Redact file paths and internal details from error messages. */
 export function sanitizeError(err: unknown): string {
-  let msg = err instanceof Error ? err.message : String(err);
-  msg = msg.replace(/\/[^\s"']+/g, "[path]");
-  if (msg.length > 500) msg = msg.slice(0, 500) + "... (truncated)";
-  return msg;
+  const msg = err instanceof Error ? err.message : String(err);
+  return coreSanitize(msg, 500);
 }
 
 import { program } from "commander";
