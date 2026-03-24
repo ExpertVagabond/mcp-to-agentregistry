@@ -5,19 +5,23 @@
 // - No hardcoded secrets — registry URL from env or CLI args
 // - All user inputs validated for length, charset, and injection risks
 // - Config file size bounded to prevent memory exhaustion
+// - Uses psm-mcp-core for error sanitization and shared validation
 
 use clap::{Parser, Subcommand};
 use serde::Deserialize;
 use serde_json::{Value, json};
+
+use psm_mcp_core::error::sanitize_error as core_sanitize_error;
+use psm_mcp_core::input::validate_input_size;
 
 const NPM_REGISTRY: &str = "https://registry.npmjs.org";
 const SCHEMA_URL: &str =
     "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json";
 
 // ---- Security: input validation constants ----
-/// Sanitize error messages — strip internal paths before display.
+/// Sanitize error messages — delegates to psm-mcp-core (strips paths, redacts tokens).
 fn sanitize_error(msg: &str) -> String {
-    msg.lines().next().unwrap_or("Internal error").chars().take(500).collect()
+    core_sanitize_error(msg, 500)
 }
 
 /// Maximum length for npm package names (npm limit is 214).
@@ -43,9 +47,7 @@ fn validate_package_name(name: &str) -> Result<(), String> {
 
 /// Validate a version string — semver-like, no injection.
 fn validate_version(v: &str) -> Result<(), String> {
-    if v.len() > MAX_VERSION_LEN {
-        return Err("Version string too long".into());
-    }
+    validate_input_size(v, MAX_VERSION_LEN).map_err(|e| format!("version: {e}"))?;
     if !v.chars().all(|c| c.is_ascii_alphanumeric() || "-_.+".contains(c)) {
         return Err(format!("Version contains invalid characters: {v}"));
     }
@@ -57,9 +59,7 @@ fn validate_url(url: &str) -> Result<(), String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
         return Err(format!("URL must use http(s) scheme: {url}"));
     }
-    if url.len() > 2048 {
-        return Err("URL exceeds maximum length of 2048".into());
-    }
+    validate_input_size(url, 2048).map_err(|e| format!("URL: {e}"))?;
     Ok(())
 }
 

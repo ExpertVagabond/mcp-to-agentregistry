@@ -1,6 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { sanitizeError } from "../cli.js";
+import { PsmMcpError, validateInputSize } from "@psm/mcp-core-ts";
 import type { ToolInfo } from "./types.js";
 
 export async function introspectServer(
@@ -9,14 +10,12 @@ export async function introspectServer(
 ): Promise<ToolInfo[]> {
   // Validate package name to prevent command injection via npx
   if (!npmPackage || typeof npmPackage !== "string") {
-    throw new Error("npm package name is required");
+    throw PsmMcpError.inputValidation("npm package name is required");
   }
-  if (npmPackage.length > 214) {
-    throw new Error("Package name exceeds maximum length");
-  }
+  validateInputSize(npmPackage, 214);
   // Must match npm naming: @scope/name or name, no shell metacharacters
   if (!/^(@[a-z0-9\-~][a-z0-9\-._~]*\/)?[a-z0-9\-~][a-z0-9\-._~]*$/.test(npmPackage)) {
-    throw new Error(`Invalid npm package name: ${npmPackage}`);
+    throw PsmMcpError.inputValidation(`Invalid npm package name: ${npmPackage}`);
   }
   // Clamp timeout to reasonable bounds
   timeout = Math.min(Math.max(5000, timeout), 60000);
